@@ -1,0 +1,1 @@
+export { type UserRepository, USER_REPOSITORY_TOKEN } from './user.repository.js';

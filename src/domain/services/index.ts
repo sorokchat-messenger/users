@@ -1,0 +1,1 @@
+export * from './passwrd-encoder.interface.js';
