@@ -3,7 +3,7 @@ import { type IMapper } from "./mapper.interface.js";
 import { User as Domain, HashedPassword } from "../../../domain/index.js";
 import { IdMapper } from "./id.mapper.js";
 import { HashedPasswordMapper } from "./hashed-password.mapper.js";
-import { User as Persistence } from "../prisma/generated/client.js"
+import { User as Persistence } from "@prisma/client"
 
 @Injectable()
 export class UserMapper implements IMapper<Domain, Persistence> {
