@@ -1,1 +1,1 @@
-export { type UserRepository, USER_REPOSITORY_TOKEN } from './user.repository.js';
+export { type IUserRepository, USER_REPOSITORY_TOKEN } from './user.repository.js';
