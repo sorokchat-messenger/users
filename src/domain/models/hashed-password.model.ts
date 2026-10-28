@@ -1,4 +1,4 @@
-import { PasswordNullException, PasswordEmptyException, PasswordSizeException } from "../exceptions/index.js";
+import { PasswordNullException, PasswordEmptyException, PasswordMinException, PasswordMaxException } from "../exceptions/index.js";
 import { type IPasswordEncoder } from "../services/index.js";
 
 export class HashedPassword {
@@ -16,7 +16,8 @@ export class HashedPassword {
         if (!password) throw new PasswordNullException();
         const plaintext = password.trim();
         if (!plaintext.length) throw new PasswordEmptyException();
-        if (plaintext.length < 8 || plaintext.length > 100) throw new PasswordSizeException();
+        if (plaintext.length < 8) throw new PasswordMinException();
+        if (plaintext.length > 100) throw new PasswordMaxException();
         return new HashedPassword(await encoder.encode(plaintext));
     }
 

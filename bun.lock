@@ -12,7 +12,7 @@
         "@nestjs/platform-express": "^12.0.1",
         "@prisma/client": "^7.10.1",
         "@sorokchat-messenger/config": "^1.0.5",
-        "@sorokchat-messenger/contracts": "^1.0.30",
+        "@sorokchat-messenger/contracts": "^1.0.31",
         "@sorokchat-messenger/cryptography-node": "^1.0.5",
         "@sorokchat-messenger/microservices": "^1.0.19",
         "reflect-metadata": "^0.2.2",
@@ -282,7 +282,7 @@
 
     "@sorokchat-messenger/config": ["@sorokchat-messenger/config@1.0.5", "", { "dependencies": { "@nestjs/config": "^12.0.0" }, "peerDependencies": { "vitest": "^5.0.0", "zod": "^4.6.2" } }, "sha512-VFAfHtLmrpSKk0HdK8blB1Kfl16S50zNEkcEzB/jPPuH6TmtIllosZVsnws5nbK+mAvCp/XIwvLzAP22asHOTQ=="],
 
-    "@sorokchat-messenger/contracts": ["@sorokchat-messenger/contracts@1.0.30", "", { "dependencies": { "@vitest/coverage-v8": "^5.0.1", "reflect-metadata": "^0.2.2", "vitest": "^5.0.1", "zod": "^4.5.4" } }, "sha512-jBNo1pLf+jEDh8QhPpK9aqmJjlWLz9jjM8ZZRCZMs4E1ozyrL/AEEJxN1PS2Sj65Rqv6RA7W4z5lcL3TAGgfng=="],
+    "@sorokchat-messenger/contracts": ["@sorokchat-messenger/contracts@1.0.31", "", { "dependencies": { "@vitest/coverage-v8": "^5.0.1", "reflect-metadata": "^0.2.2", "vitest": "^5.0.1", "zod": "^4.5.4" } }, "sha512-f7VLyYQn0L6EDXoRBR0qbhpQW01dZ36MCrEKs9VVGfG21wTKlA9Lde2u99E2bnLJro5H7b3eYuF9L+gPs3BMHw=="],
 
     "@sorokchat-messenger/core": ["@sorokchat-messenger/core@1.0.0", "", { "peerDependencies": { "prettier": "^3.9.6" } }, "sha512-DxKnCJ4u4TEpU25DAiuXOdY3miI8WelEzxlvCKZJbhdhwXtdqfsnl6W8dRp3HQpiE3xDZqWImkB8TmiBN31/sQ=="],
 
