@@ -1,3 +1,4 @@
+import { CreateUserUseCase } from "./create-user.use-case.js";
 import { DeleteUserUseCase } from "./delete-user.use-case.js";
 import { GetUserByIdUseCase } from "./get-user-by-id.use-case.js";
 import { GetUsersByTermUseCase } from "./get-users-by-term.use-case.js";
@@ -12,6 +13,7 @@ export * from './get-users-by-term.use-case.js';
 export const USE_CASES = [
     GetUserByIdUseCase,
     GetUserByIdUseCase,
+    CreateUserUseCase,
     UpdateUserUseCase,
     DeleteUserUseCase,
     GetUsersByTermUseCase
