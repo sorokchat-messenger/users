@@ -31,7 +31,7 @@
     "@sorokchat-messenger/config": "^1.0.5",
     "@sorokchat-messenger/contracts": "^1.0.31",
     "@sorokchat-messenger/cryptography-node": "^1.0.5",
-    "@sorokchat-messenger/microservices": "^1.0.19",
+    "@sorokchat-messenger/microservices": "^1.0.20",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "uuidv7": "^1.2.1",

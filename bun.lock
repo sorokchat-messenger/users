@@ -14,7 +14,7 @@
         "@sorokchat-messenger/config": "^1.0.5",
         "@sorokchat-messenger/contracts": "^1.0.31",
         "@sorokchat-messenger/cryptography-node": "^1.0.5",
-        "@sorokchat-messenger/microservices": "^1.0.19",
+        "@sorokchat-messenger/microservices": "^1.0.20",
         "reflect-metadata": "^0.2.2",
         "rxjs": "^7.8.1",
         "uuidv7": "^1.2.1",
@@ -290,7 +290,7 @@
 
     "@sorokchat-messenger/cryptography-node": ["@sorokchat-messenger/cryptography-node@1.0.5", "", { "dependencies": { "argon2": "^0.45.1", "vitest": "^5.0.0" } }, "sha512-xweaPdpvnVivQGUxrS6bs8rKmVZJ7qLdo5N0YTWkdA9DK+Z9UODwDB/Zz19qXjYoBPKfJ+Y0XSK/JZ5ODmTLkw=="],
 
-    "@sorokchat-messenger/microservices": ["@sorokchat-messenger/microservices@1.0.19", "", { "peerDependencies": { "@nestjs/common": "^12.0.1", "@nestjs/core": "^12.0.1", "@nestjs/microservices": "^12.0.1" } }, "sha512-BhB7AiLX1DNtHpkS3kfzPDs+OpHK47DJhaATf94HjGitxMXcBuumureGw35M8SNkVsHZLgOK/0pb8faqVllRJg=="],
+    "@sorokchat-messenger/microservices": ["@sorokchat-messenger/microservices@1.0.20", "", { "peerDependencies": { "@nestjs/common": "^12.0.1", "@nestjs/core": "^12.0.1", "@nestjs/microservices": "^12.0.1" } }, "sha512-s4Jkf9xlpxH2Moyv4xPW8iG3dWsqVQjPvoZFzwqQ0S4I2PrmxF1yiafDyvbFwM6T/Xxc4FFfrDxiknYmcRozAA=="],
 
     "@standard-schema/spec": ["@standard-schema/spec@1.1.0", "", {}, "sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w=="],
 

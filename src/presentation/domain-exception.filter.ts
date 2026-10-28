@@ -10,6 +10,7 @@ import {
     PasswordMaxException,
     UserNotFoundException,
     PasswordEmptyException,
+    BadCredentialsException,
 } from "../domain/index.js";
 import { Observable, throwError } from "rxjs";
 import { UserCodes, UNKNOWN, AuthorizationCodes } from "@sorokchat-messenger/contracts";
@@ -51,6 +52,10 @@ export class DomainExceptionFilter implements RpcExceptionFilter {
         if (exception instanceof UserNotFoundException) {
             message = UserCodes.NOT_FOUND;
             code = GrpcStatus.NOT_FOUND;
+        }
+        if (exception instanceof BadCredentialsException) {
+            message = AuthorizationCodes.BAD_CREDENTIALS;
+            code = GrpcStatus.INVALID_ARGUMENT;
         }
         return throwError(() => new RpcException({ code, message }));
     }

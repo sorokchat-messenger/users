@@ -7,3 +7,4 @@ export * from './password-max.exception.js';
 export * from './user-not-found.exception.js';
 export * from './not-admin.exception.js';
 export * from './user-exists.exception.js';
+export * from './bad-credentials.exception.js';

@@ -53,6 +53,10 @@ export class User {
         return this;
     }
 
+    public async verifyPassword(encoder: IPasswordEncoder, password: string): Promise<boolean> {
+        return await this.hashedPassword.verify(encoder, password);
+    }
+
     public changeDisplayName(displayName: string): User {
         this._displayName = displayName;
         return this;

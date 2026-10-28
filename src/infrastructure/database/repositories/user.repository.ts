@@ -21,6 +21,12 @@ export class UserRepository implements IUserRepository {
         return this.mapper.toDomain(candidate);
     }
 
+    public async getByLogin(login: string): Promise<User | null> {
+        const candidate = await this.prisma.user.findUnique({ where: { login } });
+        if (candidate === null) return null;
+        return this.mapper.toDomain(candidate);
+    }
+
     public async getByTerm(term: string, limit: number, offset: number): Promise<User[]> {
         const candidates = await this.prisma.user.findMany({
             where: {

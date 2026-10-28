@@ -8,9 +8,12 @@ import {
     USERS_SERVICE,
     type GetUsersByTermResponse,
     type UpdateUserRequest,
-    type DeleteUserRequest
+    type DeleteUserRequest,
+    type CheckCredentialsRequest,
+    type CheckCredentialsResponse
 } from '@sorokchat-messenger/microservices';
 import {
+    CheckCredentialsUseCase,
     CreateUserUseCase,
     DeleteUserUseCase,
     GetUserByIdUseCase,
@@ -25,6 +28,7 @@ export class UsersGrpc {
     public constructor(
         private readonly createUserUseCase: CreateUserUseCase,
         private readonly getUserByIdUseCase: GetUserByIdUseCase,
+        private readonly checkCredentialUseCase: CheckCredentialsUseCase,
         private readonly getUsersByTermUseCase: GetUsersByTermUseCase,
         private readonly updateUserUseCase: UpdateUserUseCase,
         private readonly deleteUserUseCase: DeleteUserUseCase,
@@ -47,6 +51,11 @@ export class UsersGrpc {
         const user = await this.getUserByIdUseCase.execute({ id: payload.id });
         if (user === null) throw new UserNotFoundException();
         return this.mapper.toPresentation(user);
+    }
+
+    @GrpcMethod(USERS_SERVICE.NAME, USERS_SERVICE.CHECK_CREDENTIALS)
+    public async checkCredentials(@Payload() payload: CheckCredentialsRequest): Promise<CheckCredentialsResponse> {
+        return await this.checkCredentialUseCase.execute(payload);
     }
 
     @GrpcMethod(USERS_SERVICE.NAME, USERS_SERVICE.GET_BY_TERM)
