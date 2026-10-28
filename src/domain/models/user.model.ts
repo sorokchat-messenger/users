@@ -1,3 +1,4 @@
+import { ROLE_HIERARCHY } from "@sorokchat-messenger/contracts";
 import { type IPasswordEncoder } from "../services/index.js";
 import { HashedPassword } from "./hashed-password.model.js";
 import { Id } from "./id.model.js";
@@ -24,6 +25,18 @@ export class User {
 
     public get role(): Role {
         return this._role;
+    }
+
+    public get isUser(): boolean {
+        return ROLE_HIERARCHY.hasRole(Role.USER, this.role);
+    }
+
+    public get isPro(): boolean {
+        return ROLE_HIERARCHY.hasRole(Role.PRO, this.role);
+    }
+
+    public get isAdmin(): boolean {
+        return ROLE_HIERARCHY.hasRole(Role.ADMIN, this.role);
     }
 
     public get displayName(): string {

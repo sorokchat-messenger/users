@@ -10,6 +10,11 @@ export class UserRepository implements IUserRepository {
         private readonly idMapper: IdMapper
     ) { }
 
+    public async existsByLogin(login: string): Promise<boolean> {
+        const count = await this.prisma.user.count({ where: { login } });
+        return count > 0;
+    }
+
     public async getById(id: Id): Promise<User | null> {
         const candidate = await this.prisma.user.findUnique({ where: { id: this.idMapper.toPersistence(id) } });
         if (candidate === null) return null;
