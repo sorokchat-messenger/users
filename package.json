@@ -36,6 +36,7 @@
     "rxjs": "^7.8.1",
     "uuidv7": "^1.2.1",
     "zod": "^4.6.7",
+    "@prisma/adapter-pg": "^7.10.1",
     "pg": "^8.23.1"
   },
   "devDependencies": {
@@ -43,7 +44,6 @@
     "@nestjs/mau": "^0.2.6",
     "@nestjs/schematics": "^12.0.0",
     "@nestjs/testing": "^12.0.1",
-    "@prisma/adapter-pg": "^7.10.1",
     "@sorokchat-messenger/core": "^1.0.0",
     "@sorokchat-messenger/cryptography-abstractions": "^1.0.3",
     "@types/express": "^5.0.0",
