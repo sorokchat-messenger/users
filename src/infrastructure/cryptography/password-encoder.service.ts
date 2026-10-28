@@ -7,11 +7,11 @@ export class PasswordEncoder implements IPasswordEncoder {
     public constructor(@Inject(ENCODER_TOKEN) private readonly encoder: Encoder) { }
 
     public async encode(plaintext: string): Promise<string> {
-        throw new Error("Method not implemented.");
+        return await this.encoder.encode(plaintext);
     }
 
     public async verify(encoded: string, plaintext: string): Promise<boolean> {
-        throw new Error("Method not implemented.");
+        return await this.encoder.verify(plaintext, encoded);
     }
 }
 
