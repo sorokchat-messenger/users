@@ -17,9 +17,7 @@ export interface CreateUserRequest {
     displayName: string | null;
 }
 
-export type CreateUserResponse = {
-    id: Id;
-};
+export type CreateUserResponse = User;
 
 @Injectable()
 export class CreateUserUseCase implements IUseCase<CreateUserRequest, CreateUserResponse> {
@@ -34,6 +32,6 @@ export class CreateUserUseCase implements IUseCase<CreateUserRequest, CreateUser
         const hashedPassword = await HashedPassword.create(this.passwordEncoder, payload.password);
         const user = User.create(payload.login, hashedPassword, payload.displayName);
         await this.repository.save(user);
-        return { id: user.id };
+        return user;
     }
 }

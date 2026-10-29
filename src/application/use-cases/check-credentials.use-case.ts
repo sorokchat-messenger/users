@@ -1,15 +1,19 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { type IUseCase } from "./use-case.interface.js";
-import { BadCredentialsException, PASSWORD_ENCODER_TOKEN, USER_REPOSITORY_TOKEN, type IPasswordEncoder, type IUserRepository } from "../../domain/index.js";
-
+import {
+    BadCredentialsException,
+    PASSWORD_ENCODER_TOKEN,
+    USER_REPOSITORY_TOKEN,
+    type IPasswordEncoder,
+    type IUserRepository,
+    User
+} from "../../domain/index.js";
 export interface CheckCredentialsRequest {
     login: string;
     password: string;
 }
 
-export interface CheckCredentialsResponse {
-    ok: boolean;
-}
+export type CheckCredentialsResponse = User | null;
 
 @Injectable()
 export class CheckCredentialsUseCase implements IUseCase<CheckCredentialsRequest, CheckCredentialsResponse> {
@@ -22,6 +26,6 @@ export class CheckCredentialsUseCase implements IUseCase<CheckCredentialsRequest
         const user = await this.repository.getByLogin(request.login);
         if (user === null) throw new BadCredentialsException();
         const isPasswordCorrect = await user.verifyPassword(this.encoder, request.password);
-        return { ok: isPasswordCorrect };
+        return isPasswordCorrect ? user : null;
     }
 }

@@ -21,7 +21,7 @@ import {
     UpdateUserUseCase
 } from '../../application/index.js';
 import { Id, UserNotFoundException } from '../../domain/index.js';
-import { IdMapper, UserMapper } from '../mappers/index.js';
+import { UserMapper } from '../mappers/index.js';
 
 @GrpcService(USERS_SERVICE.NAME)
 export class UsersGrpc {
@@ -32,18 +32,17 @@ export class UsersGrpc {
         private readonly getUsersByTermUseCase: GetUsersByTermUseCase,
         private readonly updateUserUseCase: UpdateUserUseCase,
         private readonly deleteUserUseCase: DeleteUserUseCase,
-        private readonly mapper: UserMapper,
-        private readonly idMapper: IdMapper
+        private readonly mapper: UserMapper
     ) { }
 
     @GrpcMethod(USERS_SERVICE.NAME, USERS_SERVICE.CREATE)
     public async create(@Payload() payload: CreateUserRequest): Promise<CreateUserResponse> {
-        const { id } = await this.createUserUseCase.execute({
+        const user = await this.createUserUseCase.execute({
             login: payload.login,
             password: payload.password,
             displayName: payload.displayName || null
         });
-        return { id: this.idMapper.toPresentation(id) };
+        return { user: this.mapper.toPresentation(user) };
     }
 
     @GrpcMethod(USERS_SERVICE.NAME, USERS_SERVICE.GET_BY_ID)
@@ -55,7 +54,9 @@ export class UsersGrpc {
 
     @GrpcMethod(USERS_SERVICE.NAME, USERS_SERVICE.CHECK_CREDENTIALS)
     public async checkCredentials(@Payload() payload: CheckCredentialsRequest): Promise<CheckCredentialsResponse> {
-        return await this.checkCredentialUseCase.execute(payload);
+        const user = await this.checkCredentialUseCase.execute(payload);
+        if (user === null) return { user: undefined };
+        return { user: this.mapper.toPresentation(user) };
     }
 
     @GrpcMethod(USERS_SERVICE.NAME, USERS_SERVICE.GET_BY_TERM)
