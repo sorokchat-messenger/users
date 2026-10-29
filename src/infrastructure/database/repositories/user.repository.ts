@@ -1,8 +1,9 @@
-import { type Provider } from "@nestjs/common";
+import { Injectable, type Provider } from "@nestjs/common";
 import { Id, User, USER_REPOSITORY_TOKEN, type IUserRepository } from "../../../domain/index.js";
 import { PrismaService } from "../prisma/prisma.service.js";
 import { IdMapper, UserMapper } from "../mappers/index.js";
 
+@Injectable()
 export class UserRepository implements IUserRepository {
     public constructor(
         private readonly prisma: PrismaService,
