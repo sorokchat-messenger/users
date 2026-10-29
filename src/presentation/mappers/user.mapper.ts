@@ -12,7 +12,8 @@ export class UserMapper implements IMapper<User, GetUserResponse> {
         return {
             login: domain.login,
             role: domain.role as Role,
-            displayName: domain.displayName
+            displayName: domain.displayName,
+            id: this.idMapper.toPresentation(domain.id)
         }
     }
 
