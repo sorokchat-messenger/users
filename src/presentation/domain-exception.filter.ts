@@ -1,5 +1,8 @@
 import { Catch, type RpcExceptionFilter } from "@nestjs/common";
-import { RpcException } from '@nestjs/microservices';
+import { RpcException } from "@nestjs/microservices";
+import { Observable, throwError } from "rxjs";
+import { UserCodes, UNKNOWN, AuthorizationCodes } from "@sorokchat-messenger/contracts";
+import { GrpcStatus } from "@sorokchat-messenger/microservices";
 import {
     DomainException,
     NotIdException,
@@ -12,9 +15,6 @@ import {
     PasswordEmptyException,
     BadCredentialsException,
 } from "../domain/index.js";
-import { Observable, throwError } from "rxjs";
-import { UserCodes, UNKNOWN, AuthorizationCodes } from "@sorokchat-messenger/contracts";
-import { GrpcStatus } from "@sorokchat-messenger/microservices";
 
 interface ExceptionMapping {
     code: GrpcStatus;
@@ -37,6 +37,7 @@ export class DomainExceptionFilter implements RpcExceptionFilter {
 
     public catch(exception: DomainException): Observable<unknown> {
         let mapping = this.exceptionMap.get(exception.constructor);
+
         if (!mapping) {
             const exceptionName = exception.constructor?.name;
             for (const [cls, value] of this.exceptionMap.entries()) {
@@ -46,10 +47,13 @@ export class DomainExceptionFilter implements RpcExceptionFilter {
                 }
             }
         }
+
         const code = Number(mapping?.code ?? GrpcStatus.INTERNAL);
         const message = String(mapping?.message ?? UNKNOWN);
-        return throwError(() => new RpcException({
+
+        return throwError(() => ({
             code,
+            message,
             details: message,
         }));
     }
