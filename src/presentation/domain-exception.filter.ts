@@ -16,47 +16,41 @@ import { Observable, throwError } from "rxjs";
 import { UserCodes, UNKNOWN, AuthorizationCodes } from "@sorokchat-messenger/contracts";
 import { GrpcStatus } from "@sorokchat-messenger/microservices";
 
+interface ExceptionMapping {
+    code: GrpcStatus;
+    message: string;
+}
+
 @Catch(DomainException)
 export class DomainExceptionFilter implements RpcExceptionFilter {
+    private readonly exceptionMap = new Map<Function, ExceptionMapping>([
+        [NotIdException, { code: GrpcStatus.INVALID_ARGUMENT, message: UserCodes.ID.INCORRECT }],
+        [NotAdminException, { code: GrpcStatus.PERMISSION_DENIED, message: AuthorizationCodes.ACCESS_DENIED }],
+        [UserExistsException, { code: GrpcStatus.ALREADY_EXISTS, message: UserCodes.EXISTS }],
+        [PasswordNullException, { code: GrpcStatus.INVALID_ARGUMENT, message: UserCodes.PASSWORD.UNDEFINED }],
+        [PasswordEmptyException, { code: GrpcStatus.INVALID_ARGUMENT, message: UserCodes.PASSWORD.EMPTY }],
+        [PasswordMinException, { code: GrpcStatus.INVALID_ARGUMENT, message: UserCodes.PASSWORD.MIN_LENGTH.CODE }],
+        [PasswordMaxException, { code: GrpcStatus.INVALID_ARGUMENT, message: UserCodes.PASSWORD.MAX_LENGTH.CODE }],
+        [UserNotFoundException, { code: GrpcStatus.NOT_FOUND, message: UserCodes.NOT_FOUND }],
+        [BadCredentialsException, { code: GrpcStatus.INVALID_ARGUMENT, message: AuthorizationCodes.BAD_CREDENTIALS }],
+    ]);
+
     public catch(exception: DomainException): Observable<unknown> {
-        let message: string = UNKNOWN;
-        let code: GrpcStatus = GrpcStatus.INTERNAL;
-        if (exception instanceof NotIdException) {
-            message = UserCodes.ID.INCORRECT;
-            code = GrpcStatus.INVALID_ARGUMENT;
+        let mapping = this.exceptionMap.get(exception.constructor);
+        if (!mapping) {
+            const exceptionName = exception.constructor?.name;
+            for (const [cls, value] of this.exceptionMap.entries()) {
+                if (cls.name === exceptionName) {
+                    mapping = value;
+                    break;
+                }
+            }
         }
-        if (exception instanceof NotAdminException) {
-            message = AuthorizationCodes.ACCESS_DENIED;
-            code = GrpcStatus.PERMISSION_DENIED;
-        }
-        if (exception instanceof UserExistsException) {
-            message = UserCodes.EXISTS;
-            code = GrpcStatus.ALREADY_EXISTS;
-        }
-        if (exception instanceof PasswordNullException) {
-            message = UserCodes.PASSWORD.UNDEFINED;
-            code = GrpcStatus.INVALID_ARGUMENT;
-        }
-        if (exception instanceof PasswordEmptyException) {
-            message = UserCodes.PASSWORD.EMPTY;
-            code = GrpcStatus.INVALID_ARGUMENT;
-        }
-        if (exception instanceof PasswordMinException) {
-            message = UserCodes.PASSWORD.MIN_LENGTH.CODE;
-            code = GrpcStatus.INVALID_ARGUMENT;
-        }
-        if (exception instanceof PasswordMaxException) {
-            message = UserCodes.PASSWORD.MAX_LENGTH.CODE;
-            code = GrpcStatus.INVALID_ARGUMENT;
-        }
-        if (exception instanceof UserNotFoundException) {
-            message = UserCodes.NOT_FOUND;
-            code = GrpcStatus.NOT_FOUND;
-        }
-        if (exception instanceof BadCredentialsException) {
-            message = AuthorizationCodes.BAD_CREDENTIALS;
-            code = GrpcStatus.INVALID_ARGUMENT;
-        }
-        return throwError(() => new RpcException({ code, message }));
+        const code = Number(mapping?.code ?? GrpcStatus.INTERNAL);
+        const message = String(mapping?.message ?? UNKNOWN);
+        return throwError(() => new RpcException({
+            code,
+            details: message,
+        }));
     }
 }
