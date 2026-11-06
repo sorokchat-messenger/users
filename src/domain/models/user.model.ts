@@ -3,8 +3,10 @@ import { type IPasswordEncoder } from "../services/index.js";
 import { HashedPassword } from "./hashed-password.model.js";
 import { Id } from "./id.model.js";
 import { Role } from "./role.js";
+import { AggregateRoot } from "@nestjs/cqrs";
+import { UserCreatedEvent } from "../events/index.js";
 
-export class User {
+export class User extends AggregateRoot {
     private readonly _id: Id;
     private _login: string;
     private _hashedPassword: HashedPassword;
@@ -68,6 +70,7 @@ export class User {
     }
 
     private constructor(id: Id, login: string, hashedPassword: HashedPassword, displayName: string, role: Role) {
+        super();
         this._id = id;
         this._login = login;
         this._hashedPassword = hashedPassword;
@@ -76,7 +79,8 @@ export class User {
     }
 
     public static create(login: string, hashedPassword: HashedPassword, displayName: string | null) {
-        return new User(Id.create(), login, hashedPassword.clone(), displayName ?? login, Role.USER);
+        const user = new User(Id.create(), login, hashedPassword.clone(), displayName ?? login, Role.USER);
+        user.apply(new UserCreatedEvent(user.id.value));
     }
 
     public static restore(id: Id, login: string, hashedPassword: HashedPassword, displayName: string, role: Role): User {
