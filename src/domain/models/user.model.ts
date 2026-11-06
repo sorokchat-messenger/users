@@ -78,9 +78,10 @@ export class User extends AggregateRoot {
         this._role = role;
     }
 
-    public static create(login: string, hashedPassword: HashedPassword, displayName: string | null) {
+    public static create(login: string, hashedPassword: HashedPassword, displayName: string | null): User {
         const user = new User(Id.create(), login, hashedPassword.clone(), displayName ?? login, Role.USER);
         user.apply(new UserCreatedEvent(user.id.value));
+        return user;
     }
 
     public static restore(id: Id, login: string, hashedPassword: HashedPassword, displayName: string, role: Role): User {

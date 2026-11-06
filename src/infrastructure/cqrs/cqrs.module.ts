@@ -10,7 +10,7 @@ const PROVIDERS: Provider[] = [...COMMANDS, ...QUERIES, CqrsBus, EventBridgeHand
 @Module({
     imports: [Cqrs],
     providers: PROVIDERS,
-    exports: PROVIDERS
+    exports: [...PROVIDERS, Cqrs]
 
 })
 export class CqrsModule { }
