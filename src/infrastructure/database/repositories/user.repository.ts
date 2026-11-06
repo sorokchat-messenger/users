@@ -1,11 +1,13 @@
 import { Injectable, type Provider } from "@nestjs/common";
 import { HashedPassword, Id, User, USER_REPOSITORY_TOKEN, type IUserRepository } from "../../../domain/index.js";
 import { PrismaService } from "../prisma/prisma.service.js";
+import { EventPublisher } from "@nestjs/cqrs";
 
 @Injectable()
 export class UserRepository implements IUserRepository {
     public constructor(
         private readonly prisma: PrismaService,
+        private readonly publisher: EventPublisher
     ) { }
 
     public async existsByLogin(login: string): Promise<boolean> {
@@ -71,6 +73,8 @@ export class UserRepository implements IUserRepository {
             create: mapped,
             update: payload
         });
+        const context = this.publisher.mergeObjectContext(user);
+        context.commit();
     }
 
     public async delete(id: Id): Promise<void> {
