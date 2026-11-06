@@ -1,14 +1,11 @@
 import { Injectable, type Provider } from "@nestjs/common";
-import { Id, User, USER_REPOSITORY_TOKEN, type IUserRepository } from "../../../domain/index.js";
+import { HashedPassword, Id, User, USER_REPOSITORY_TOKEN, type IUserRepository } from "../../../domain/index.js";
 import { PrismaService } from "../prisma/prisma.service.js";
-import { IdMapper, UserMapper } from "../mappers/index.js";
 
 @Injectable()
 export class UserRepository implements IUserRepository {
     public constructor(
         private readonly prisma: PrismaService,
-        private readonly mapper: UserMapper,
-        private readonly idMapper: IdMapper
     ) { }
 
     public async existsByLogin(login: string): Promise<boolean> {
@@ -17,15 +14,27 @@ export class UserRepository implements IUserRepository {
     }
 
     public async getById(id: Id): Promise<User | null> {
-        const candidate = await this.prisma.user.findUnique({ where: { id: this.idMapper.toPersistence(id) } });
+        const candidate = await this.prisma.user.findUnique({ where: { id: id.value } });
         if (candidate === null) return null;
-        return this.mapper.toDomain(candidate);
+        return User.restore(
+            Id.restore(candidate.id),
+            candidate.login,
+            HashedPassword.restore(candidate.password),
+            candidate.displayName,
+            candidate.role
+        );
     }
 
     public async getByLogin(login: string): Promise<User | null> {
         const candidate = await this.prisma.user.findUnique({ where: { login } });
         if (candidate === null) return null;
-        return this.mapper.toDomain(candidate);
+        return User.restore(
+            Id.restore(candidate.id),
+            candidate.login,
+            HashedPassword.restore(candidate.password),
+            candidate.displayName,
+            candidate.role
+        );
     }
 
     public async getByTerm(term: string, limit: number, offset: number): Promise<User[]> {
@@ -39,11 +48,23 @@ export class UserRepository implements IUserRepository {
             take: limit,
             skip: offset
         });
-        return candidates.map(candidate => this.mapper.toDomain(candidate));
+        return candidates.map(candidate => User.restore(
+            Id.restore(candidate.id),
+            candidate.login,
+            HashedPassword.restore(candidate.password),
+            candidate.displayName,
+            candidate.role
+        ));
     }
 
     public async save(user: User): Promise<void> {
-        const mapped = this.mapper.toPersistence(user);
+        const mapped = {
+            id: user.id.value,
+            login: user.login,
+            password: user.hashedPassword.value,
+            displayName: user.displayName,
+            role: user.role
+        }
         const { id, ...payload } = mapped;
         await this.prisma.user.upsert({
             where: { id: mapped.id },
@@ -53,7 +74,7 @@ export class UserRepository implements IUserRepository {
     }
 
     public async delete(id: Id): Promise<void> {
-        await this.prisma.user.deleteMany({ where: { id: this.idMapper.toPersistence(id) } });
+        await this.prisma.user.deleteMany({ where: { id: id.value } });
     }
 }
 

@@ -1,7 +1,8 @@
-import { Module } from "@nestjs/common";
+import { Global, Module } from "@nestjs/common";
 import { PrismaModule } from "./prisma/index.js";
 import { PROVIDERS } from "./repositories/index.js";
 
+@Global()
 @Module({
     imports: [PrismaModule],
     providers: PROVIDERS,

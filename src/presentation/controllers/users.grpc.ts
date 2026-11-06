@@ -12,78 +12,69 @@ import {
     type CheckCredentialsRequest,
     type CheckCredentialsResponse
 } from '@sorokchat-messenger/microservices';
+import { UserNotFoundException } from '../../domain/index.js';
+import { CqrsBus } from '../../infrastructure/index.js';
 import {
-    CheckCredentialsUseCase,
-    CreateUserUseCase,
-    DeleteUserUseCase,
-    GetUserByIdUseCase,
-    GetUsersByTermUseCase,
-    UpdateUserUseCase
+    CheckCredentialsQuery,
+    CreateUserCommand,
+    DeleteUserCommand,
+    GetUserByIdQuery,
+    GetUserByTermQuery,
+    UpdateUserCommand,
+    UserDetails
 } from '../../application/index.js';
-import { Id, UserNotFoundException } from '../../domain/index.js';
-import { UserMapper } from '../mappers/index.js';
 
 @GrpcService(USERS_SERVICE.NAME)
 export class UsersGrpc {
     public constructor(
-        private readonly createUserUseCase: CreateUserUseCase,
-        private readonly getUserByIdUseCase: GetUserByIdUseCase,
-        private readonly checkCredentialUseCase: CheckCredentialsUseCase,
-        private readonly getUsersByTermUseCase: GetUsersByTermUseCase,
-        private readonly updateUserUseCase: UpdateUserUseCase,
-        private readonly deleteUserUseCase: DeleteUserUseCase,
-        private readonly mapper: UserMapper
+        private readonly bus: CqrsBus
     ) { }
 
     @GrpcMethod(USERS_SERVICE.NAME, USERS_SERVICE.CREATE)
     public async create(@Payload() payload: CreateUserRequest): Promise<CreateUserResponse> {
-        const user = await this.createUserUseCase.execute({
-            login: payload.login,
-            password: payload.password,
-            displayName: payload.displayName || null
-        });
-        return { user: this.mapper.toPresentation(user) };
+        const user = await this.bus.execute<UserDetails>(new CreateUserCommand(
+            payload.login,
+            payload.password,
+            payload.displayName || null
+        ));
+        return { user };
     }
 
     @GrpcMethod(USERS_SERVICE.NAME, USERS_SERVICE.GET_BY_ID)
     public async getById(@Payload() payload: GetUserByIdRequest): Promise<GetUserResponse> {
-        const user = await this.getUserByIdUseCase.execute({ id: payload.id });
+        const user = await this.bus.fetch<UserDetails | null>(new GetUserByIdQuery(payload.id));
         if (user === null) throw new UserNotFoundException();
-        return this.mapper.toPresentation(user);
+        return user;
     }
 
     @GrpcMethod(USERS_SERVICE.NAME, USERS_SERVICE.CHECK_CREDENTIALS)
     public async checkCredentials(@Payload() payload: CheckCredentialsRequest): Promise<CheckCredentialsResponse> {
-        const user = await this.checkCredentialUseCase.execute(payload);
-        if (user === null) return { user: undefined };
-        return { user: this.mapper.toPresentation(user) };
+        const user = await this.bus.fetch<UserDetails>(new CheckCredentialsQuery(payload.login, payload.password));
+        return { user: user }
     }
 
     @GrpcMethod(USERS_SERVICE.NAME, USERS_SERVICE.GET_BY_TERM)
     public async getByTerm(@Payload() payload: GetUsersByTermRequest): Promise<GetUsersByTermResponse> {
-        const users = await this.getUsersByTermUseCase.execute({
-            term: payload.term,
-            limit: payload.limit,
-            offset: payload.offset
-        });
-        return { users: users.map(user => this.mapper.toPresentation(user)) };
+        const users = await this.bus.fetch<UserDetails[]>(new GetUserByTermQuery(
+            payload.term,
+            payload.limit,
+            payload.offset
+        ));
+        return { users };
     }
 
     @GrpcMethod(USERS_SERVICE.NAME, USERS_SERVICE.UPDATE)
     public async update(@Payload() payload: UpdateUserRequest): Promise<void> {
-        return await this.updateUserUseCase.execute({
-            actorId: Id.restore(payload.actorId),
-            userId: Id.restore(payload.userId),
-            login: payload.login || null,
-            displayName: payload.displayName || null
-        });
+        return await this.bus.execute<void>(new UpdateUserCommand(
+            payload.actorId,
+            payload.userId,
+            payload.login || null,
+            payload.displayName || null
+        ));
     }
 
     @GrpcMethod(USERS_SERVICE.NAME, USERS_SERVICE.DELETE)
     public async delete(@Payload() payload: DeleteUserRequest): Promise<void> {
-        return await this.deleteUserUseCase.execute({
-            actorId: Id.restore(payload.actorId),
-            userId: Id.restore(payload.userId)
-        });
+        return await this.bus.execute<void>(new DeleteUserCommand(payload.actorId, payload.userId));
     }
 }
