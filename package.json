@@ -33,7 +33,7 @@
     "@sorokchat-messenger/config": "^1.0.5",
     "@sorokchat-messenger/contracts": "^1.0.31",
     "@sorokchat-messenger/cryptography-node": "^1.0.5",
-    "@sorokchat-messenger/microservices": "^1.0.28",
+    "@sorokchat-messenger/microservices": "^1.0.29",
     "dotenv": "^18.0.9",
     "pg": "^8.23.1",
     "reflect-metadata": "^0.2.2",

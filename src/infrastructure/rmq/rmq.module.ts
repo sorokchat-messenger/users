@@ -8,7 +8,10 @@ const asyncModule = Rmq.registerAsync({
     queue: "users",
     useFactory: (config: ConfigService<AllConfigs>) => {
         return {
-            urls: [config.getOrThrow("rmq.url", { infer: true })]
+            urls: [config.getOrThrow("rmq.url", { infer: true })],
+            queueOptions: {
+                durable: true
+            }
         }
     }
 })
