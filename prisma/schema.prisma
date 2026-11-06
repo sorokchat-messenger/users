@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  schemas  = ["users"]
 }
 
 model User {
@@ -14,10 +15,13 @@ model User {
   role        Role   @default(USER)
 
   @@map("users")
+  @@schema("users")
 }
 
 enum Role {
   USER
   PRO
   ADMIN
+
+  @@schema("users")
 }
