@@ -4,7 +4,7 @@ import { HashedPassword } from "./hashed-password.model.js";
 import { Id } from "./id.model.js";
 import { Role } from "./role.js";
 import { AggregateRoot } from "@nestjs/cqrs";
-import { UserCreatedEvent } from "../events/index.js";
+import { UserCreatedEvent, UserDeletedEvent, UserUpdatedEvent } from "../events/index.js";
 
 export class User extends AggregateRoot {
     private readonly _id: Id;
@@ -12,6 +12,16 @@ export class User extends AggregateRoot {
     private _hashedPassword: HashedPassword;
     private _displayName: string;
     private _role: Role;
+    private _changed: boolean = false;
+
+    private constructor(id: Id, login: string, hashedPassword: HashedPassword, displayName: string, role: Role) {
+        super();
+        this._id = id;
+        this._login = login;
+        this._hashedPassword = hashedPassword;
+        this._displayName = displayName;
+        this._role = role;
+    }
 
     public get id(): Id {
         return this._id.clone();
@@ -46,7 +56,12 @@ export class User extends AggregateRoot {
     }
 
     public changeLogin(login: string): User {
+        if (this._login === login) return this;
         this._login = login;
+        if (!this._changed) {
+            this.apply(new UserUpdatedEvent(this.id.value));
+            this._changed = true;
+        }
         return this;
     }
 
@@ -60,22 +75,27 @@ export class User extends AggregateRoot {
     }
 
     public changeDisplayName(displayName: string): User {
+        if (this._displayName === displayName) return this;
         this._displayName = displayName;
+        if (!this._changed) {
+            this.apply(new UserUpdatedEvent(this.id.value));
+            this._changed = true;
+        }
         return this;
     }
 
     public changeRole(role: Role): User {
+        if (this._role === role) return this;
         this._role = role;
+        if (!this._changed) {
+            this.apply(new UserUpdatedEvent(this.id.value));
+            this._changed = true;
+        }
         return this;
     }
 
-    private constructor(id: Id, login: string, hashedPassword: HashedPassword, displayName: string, role: Role) {
-        super();
-        this._id = id;
-        this._login = login;
-        this._hashedPassword = hashedPassword;
-        this._displayName = displayName;
-        this._role = role;
+    public delete() {
+        this.apply(new UserDeletedEvent(this.id.value));
     }
 
     public static create(login: string, hashedPassword: HashedPassword, displayName: string | null): User {

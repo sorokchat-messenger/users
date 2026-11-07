@@ -18,7 +18,10 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand, voi
             if (actor === null) throw new UserNotFoundException();
             if (!actor.isAdmin) throw new NotAdminException();
         }
-        await this.repository.delete(userId);
+        const user = await this.repository.getById(userId);
+        if (!user) throw new UserNotFoundException();
+        user.delete();
+        await this.repository.delete(user);
     }
 
 }

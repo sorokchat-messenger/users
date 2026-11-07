@@ -73,12 +73,16 @@ export class UserRepository implements IUserRepository {
             create: mapped,
             update: payload
         });
-        const context = this.publisher.mergeObjectContext(user);
-        context.commit();
+        this.commitEvents(user);
     }
 
-    public async delete(id: Id): Promise<void> {
-        await this.prisma.user.deleteMany({ where: { id: id.value } });
+    public async delete(user: User): Promise<void> {
+        await this.prisma.user.deleteMany({ where: { id: user.id.value } });
+        this.commitEvents(user);
+    }
+
+    private commitEvents(user: User): void {
+        this.publisher.mergeObjectContext(user).commit();
     }
 }
 
