@@ -56,6 +56,10 @@ export class User extends AggregateRoot {
         return this._displayName;
     }
 
+    public get isChanged(): boolean {
+        return this._changed;
+    }
+
     public get isDeleted(): boolean {
         return this._deleted;
     }

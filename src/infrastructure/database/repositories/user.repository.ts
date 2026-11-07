@@ -62,7 +62,7 @@ export class UserRepository implements IUserRepository {
     public async save(user: User): Promise<void> {
         if (user.isDeleted) {
             await this.prisma.user.deleteMany({ where: { id: user.id.value } });
-        } else {
+        } else if (user.isChanged) {
             const mapped = {
                 id: user.id.value,
                 login: user.login,
