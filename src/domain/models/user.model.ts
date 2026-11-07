@@ -14,14 +14,16 @@ export class User extends AggregateRoot {
     private _role: Role;
     private _changed: boolean = false;
     private _deleted: boolean = false;
+    private _created: boolean;
 
-    private constructor(id: Id, login: string, hashedPassword: HashedPassword, displayName: string, role: Role) {
+    private constructor(id: Id, login: string, hashedPassword: HashedPassword, displayName: string, role: Role, created: boolean) {
         super();
         this._id = id;
         this._login = login;
         this._hashedPassword = hashedPassword;
         this._displayName = displayName;
         this._role = role;
+        this._created = created;
     }
 
     public get id(): Id {
@@ -62,6 +64,10 @@ export class User extends AggregateRoot {
 
     public get isDeleted(): boolean {
         return this._deleted;
+    }
+
+    public get isCreated(): boolean {
+        return this._created;
     }
 
     public changeLogin(login: string): User {
@@ -112,13 +118,13 @@ export class User extends AggregateRoot {
     }
 
     public static create(login: string, hashedPassword: HashedPassword, displayName: string | null): User {
-        const user = new User(Id.create(), login, hashedPassword.clone(), displayName ?? login, Role.USER);
+        const user = new User(Id.create(), login, hashedPassword.clone(), displayName ?? login, Role.USER, true);
         user.apply(new UserCreatedEvent(user.id.value));
         return user;
     }
 
     public static restore(id: Id, login: string, hashedPassword: HashedPassword, displayName: string, role: Role): User {
-        return new User(id, login, hashedPassword, displayName, role);
+        return new User(id, login, hashedPassword, displayName, role, false);
     }
 
     public equal(other?: User | null): boolean {
@@ -127,6 +133,6 @@ export class User extends AggregateRoot {
     }
 
     public clone(): User {
-        return new User(this.id, this.login, this.hashedPassword, this.displayName, this.role);
+        return new User(this.id, this.login, this.hashedPassword, this.displayName, this.role, false);
     }
 }

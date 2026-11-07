@@ -60,21 +60,26 @@ export class UserRepository implements IUserRepository {
     }
 
     public async save(user: User): Promise<void> {
+        const mapped = {
+            id: user.id.value,
+            login: user.login,
+            password: user.hashedPassword.value,
+            displayName: user.displayName,
+            role: user.role
+        }
+        const { id, ...payload } = mapped;
         if (user.isDeleted) {
             await this.prisma.user.deleteMany({ where: { id: user.id.value } });
-        } else if (user.isChanged) {
-            const mapped = {
-                id: user.id.value,
-                login: user.login,
-                password: user.hashedPassword.value,
-                displayName: user.displayName,
-                role: user.role
-            }
-            const { id, ...payload } = mapped;
-            await this.prisma.user.upsert({
+        }
+        else if (user.isCreated) {
+            await this.prisma.user.create({
+                data: mapped
+            });
+        }
+        else if (user.isChanged) {
+            await this.prisma.user.updateMany({
                 where: { id: mapped.id },
-                create: mapped,
-                update: payload
+                data: payload
             });
         }
         this.publisher.mergeObjectContext(user).commit();
