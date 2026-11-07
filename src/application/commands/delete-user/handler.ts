@@ -20,8 +20,7 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand, voi
         }
         const user = await this.repository.getById(userId);
         if (!user) throw new UserNotFoundException();
-        user.delete();
-        await this.repository.delete(user);
+        await this.repository.save(user.delete());
     }
 
 }

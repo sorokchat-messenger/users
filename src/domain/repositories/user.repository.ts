@@ -6,7 +6,6 @@ export interface IUserRepository {
     getByLogin(login: string): Promise<User | null>;
     existsByLogin(login: string): Promise<boolean>;
     save(user: User): Promise<void>;
-    delete(user: User): Promise<void>;
 }
 
 export const USER_REPOSITORY_TOKEN: string = "USER_REPOSITORY_TOKEN";

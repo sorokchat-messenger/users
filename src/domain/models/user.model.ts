@@ -13,6 +13,7 @@ export class User extends AggregateRoot {
     private _displayName: string;
     private _role: Role;
     private _changed: boolean = false;
+    private _deleted: boolean = false;
 
     private constructor(id: Id, login: string, hashedPassword: HashedPassword, displayName: string, role: Role) {
         super();
@@ -55,6 +56,10 @@ export class User extends AggregateRoot {
         return this._displayName;
     }
 
+    public get isDeleted(): boolean {
+        return this._deleted;
+    }
+
     public changeLogin(login: string): User {
         if (this._login === login) return this;
         this._login = login;
@@ -94,8 +99,12 @@ export class User extends AggregateRoot {
         return this;
     }
 
-    public delete() {
+    public delete(): User {
+        if (this._deleted) return this;
+        this._deleted = true;
+        this.uncommit();
         this.apply(new UserDeletedEvent(this.id.value));
+        return this;
     }
 
     public static create(login: string, hashedPassword: HashedPassword, displayName: string | null): User {
