@@ -12,8 +12,8 @@ export class User extends AggregateRoot {
     private _hashedPassword: HashedPassword;
     private _displayName: string;
     private _role: Role;
-    private _changed: boolean = false;
-    private _deleted: boolean = false;
+    private _changed: boolean;
+    private _deleted: boolean;
     private _created: boolean;
 
     private constructor(id: Id, login: string, hashedPassword: HashedPassword, displayName: string, role: Role, created: boolean) {
@@ -23,7 +23,7 @@ export class User extends AggregateRoot {
         this._hashedPassword = hashedPassword;
         this._displayName = displayName;
         this._role = role;
-        this._created = created;
+        if (created) this.markAsCreated();
     }
 
     public get id(): Id {
@@ -74,8 +74,7 @@ export class User extends AggregateRoot {
         if (this._login === login) return this;
         this._login = login;
         if (!this._changed) {
-            this.apply(new UserUpdatedEvent(this.id.value));
-            this._changed = true;
+            this.markAsChanged();
         }
         return this;
     }
@@ -92,34 +91,25 @@ export class User extends AggregateRoot {
     public changeDisplayName(displayName: string): User {
         if (this._displayName === displayName) return this;
         this._displayName = displayName;
-        if (!this._changed) {
-            this.apply(new UserUpdatedEvent(this.id.value));
-            this._changed = true;
-        }
+        this.markAsChanged();
         return this;
     }
 
     public changeRole(role: Role): User {
         if (this._role === role) return this;
         this._role = role;
-        if (!this._changed) {
-            this.apply(new UserUpdatedEvent(this.id.value));
-            this._changed = true;
-        }
+        this.markAsChanged();
         return this;
     }
 
     public delete(): User {
         if (this._deleted) return this;
-        this._deleted = true;
-        this.uncommit();
-        this.apply(new UserDeletedEvent(this.id.value));
+        this.markAsDeleted();
         return this;
     }
 
     public static create(login: string, hashedPassword: HashedPassword, displayName: string | null): User {
         const user = new User(Id.create(), login, hashedPassword.clone(), displayName ?? login, Role.USER, true);
-        user.apply(new UserCreatedEvent(user.id.value));
         return user;
     }
 
@@ -134,5 +124,36 @@ export class User extends AggregateRoot {
 
     public clone(): User {
         return new User(this.id, this.login, this.hashedPassword, this.displayName, this.role, false);
+    }
+
+    private markAsCreated(): void {
+        if (!this._created) {
+            this.cleanState();
+            this._created = true;
+            this.apply(new UserCreatedEvent(this._id.value));
+        }
+    }
+
+    private markAsChanged(): void {
+        if (!this._changed) {
+            this.cleanState();
+            this._changed = true;
+            this.apply(new UserUpdatedEvent(this._id.value));
+        }
+    }
+
+    private markAsDeleted(): void {
+        if (!this._deleted) {
+            this.cleanState();
+            this._deleted = true;
+            this.apply(new UserDeletedEvent(this._id.value));
+        }
+    }
+
+    private cleanState(): void {
+        this.uncommit();
+        this._created = false;
+        this._changed = false;
+        this._deleted = false;
     }
 }
