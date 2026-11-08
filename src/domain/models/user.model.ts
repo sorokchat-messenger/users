@@ -4,7 +4,7 @@ import { HashedPassword } from "./hashed-password.model.js";
 import { Id } from "./id.model.js";
 import { Role } from "./role.js";
 import { AggregateRoot } from "@nestjs/cqrs";
-import { UserCreatedEvent, UserDeletedEvent, UserUpdatedEvent } from "../events/index.js";
+import { UserCreatedEvent, UserDeletedEvent, UserUpdatedEvent } from "@sorokchat-messenger/shared-events";
 
 export class User extends AggregateRoot {
     private readonly _id: Id;
